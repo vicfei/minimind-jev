@@ -1,0 +1,46 @@
+# minimind-jev
+
+Train your own tiny **Jev** — a System One typed-decision model, in the spirit of the [minimind](https://github.com/jingyaogong/minimind) series (open the black box, not chase SOTA), applied to decision models instead of LLMs.
+
+> Status: v0.1 prototype (private during build). What v0.1 is and is not, stated plainly:
+> the **decision head is trained from scratch**; the text encoder is frozen
+> ([BAAI/bge-small-zh-v1.5](https://huggingface.co/BAAI/bge-small-zh-v1.5)). The fully
+> from-scratch tiny transformer is v0.3 (needs a GPU).
+
+## Roadmap
+
+- **v0.1 (now)** — frozen Chinese encoder + from-scratch MLP head, trained on
+  [C-MTEB/T2Reranking](https://huggingface.co/datasets/C-MTEB/T2Reranking) hard negatives
+  (binary "does this passage answer the query" labels, the dataset's own; question wording
+  frozen from [awesome-jev-prompts](https://github.com/vicfei/awesome-jev-prompts)).
+  Temperature-scaled on a held-out split. Runs on a laptop CPU.
+- **v0.2** — multi-task distillation: a frontier chat model grades pairs into the pattern
+  library's 4-level rubric; soft targets; more question forms (Choice/Score/Noul).
+- **v0.3** — the minimind-pure form: from-scratch tiny transformer, single GPU, ~2h,
+  full Chinese tutorial.
+
+## Evaluation
+
+Same protocol as [jev-rag-zh-benchmark](https://github.com/vicfei/jev-rag-zh-benchmark):
+the eval script exports logs compatible with the benchmark's analyzer, producing a
+three-way table — hosted Jev (`jev-1.13`) vs minimind-jev vs BM25 — on the same 100
+queries over hard negatives.
+
+## Why this exists
+
+The Jev ecosystem has replicas (Kev, Bosun, …) and research-grade trainers (Valen), but
+no Chinese-language, open-the-box educational path. This is that path, built on the
+pattern library's question-design rules: the model is only half the artifact; the other
+half is the questions.
+
+## Layout
+
+```
+scripts/prepare_data.py   # T2Reranking -> typed-question train/val splits (seed 42)
+scripts/train.py          # frozen encoder + from-scratch head, CPU, temperature scaling
+scripts/eval_export.py    # benchmark-compatible eval logs
+model/head.pt             # trained head (gitignored until release)
+```
+
+Independent community project; not affiliated with TypeSafe AI, the minimind series, or
+their authors. MIT.
