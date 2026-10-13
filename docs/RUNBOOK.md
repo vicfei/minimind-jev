@@ -27,8 +27,8 @@ python scripts/train.py --epochs 5      # 输出 model/head.pt + 温度校准值
 预期输出样例（本机已验证数据阶段）：
 
 ```
-train: 1656 queries / 16560 pairs -> data/train.jsonl
-val:   183 queries / 1830 pairs   -> data/val.jsonl
+train: 1566 queries / 15660 pairs -> data/train.jsonl（基准评测集的 100 个查询已排除，零泄漏）
+val:   173 queries / 1730 pairs   -> data/val.jsonl
 epoch 1: train_loss=... val_loss=... val_acc=...
 temperature (fitted on val): ...
 saved model/head.pt

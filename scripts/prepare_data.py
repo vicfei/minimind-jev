@@ -78,10 +78,21 @@ def main() -> None:
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--val-frac", type=float, default=0.1)
     ap.add_argument("--parquet", default=None, help="path to t2reranking_dev.parquet (else auto-resolved)")
+    ap.add_argument("--exclude-sample", default="/home/ubuntu/jev-rag-zh-benchmark/data/s1.jsonl",
+                    help="benchmark eval sample; its queries are excluded from train/val (no leakage). "
+                         "Pass '' to disable.")
     args = ap.parse_args()
 
     rows = load_rows(resolve_raw(args.parquet))
     data = build(rows, args.seed)
+
+    excluded = 0
+    if args.exclude_sample and Path(args.exclude_sample).exists():
+        bench_queries = {json.loads(l)["query"] for l in Path(args.exclude_sample).read_text().splitlines()}
+        before = len(data)
+        data = [d for d in data if d["query"] not in bench_queries]
+        excluded = before - len(data)
+        print(f"excluded {excluded} queries (present in the benchmark eval sample — no leakage)")
     n_val = int(len(data) * args.val_frac)
     val, train = data[:n_val], data[n_val:]
 
