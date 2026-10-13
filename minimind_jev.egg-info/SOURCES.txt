@@ -1,0 +1,8 @@
+README.md
+pyproject.toml
+minimind_jev.egg-info/PKG-INFO
+minimind_jev.egg-info/SOURCES.txt
+minimind_jev.egg-info/dependency_links.txt
+minimind_jev.egg-info/requires.txt
+minimind_jev.egg-info/top_level.txt
+tests/test_head.py
