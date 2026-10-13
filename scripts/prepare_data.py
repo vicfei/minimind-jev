@@ -14,9 +14,34 @@ import random
 from pathlib import Path
 
 RAW = Path("/home/ubuntu/jev-rag-zh-benchmark/data/raw/t2reranking_dev.parquet")
+PARQUET_URL = ("https://huggingface.co/api/datasets/C-MTEB/T2Reranking/"
+               "parquet/default/dev/0.parquet")
 QUESTION = {"answers": {"type": "noul", "instructions": "仅凭该段落能回答该查询吗？"}}
 MAX_CHARS = 3000
 POOL_NEGATIVES = 9
+
+
+def resolve_raw(explicit: str | None) -> Path:
+    """Explicit path > local benchmark copy > download from HuggingFace."""
+    import os
+    import urllib.request
+
+    candidates = [Path(explicit)] if explicit else [
+        RAW,
+        Path(os.environ.get("MINIMIND_JEV_PARQUET", "")) if os.environ.get("MINIMIND_JEV_PARQUET") else None,
+    ]
+    for c in candidates:
+        if c and c.exists():
+            return c
+    dest = Path(__file__).resolve().parent.parent / "data" / "raw" / "t2reranking_dev.parquet"
+    if not dest.exists():
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        print(f"downloading {PARQUET_URL} …")
+        req = urllib.request.Request(PARQUET_URL, headers={"User-Agent": "minimind-jev/0.1"})
+        with urllib.request.urlopen(req, timeout=600) as r, open(dest, "wb") as f:
+            while chunk := r.read(1 << 20):
+                f.write(chunk)
+    return dest
 
 
 def load_rows(path: Path) -> list[dict]:
@@ -52,9 +77,10 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--val-frac", type=float, default=0.1)
+    ap.add_argument("--parquet", default=None, help="path to t2reranking_dev.parquet (else auto-resolved)")
     args = ap.parse_args()
 
-    rows = load_rows(RAW)
+    rows = load_rows(resolve_raw(args.parquet))
     data = build(rows, args.seed)
     n_val = int(len(data) * args.val_frac)
     val, train = data[:n_val], data[n_val:]
