@@ -58,6 +58,23 @@ python scripts/train.py --epochs 5 2>&1 | tee logs-train-v01.txt
 回传清单：`model/head.pt`、训练日志、RUN-REPORT.md（环境/曲线/温度/磁盘水位/异常）。
 v0.3 阶段追加：`model/transformer.pt`、tokenizer 文件、`config.json`。
 
+## Phase 2：v0.2 蒸馏（触发：SG 已生成并推送 `data/distilled.jsonl`）
+
+SG 节点先生成（纪律：先干跑 20 条看解析成功率与成本预估，再全量；进度追加落盘、中断可续）：
+
+```bash
+python scripts/distill_generate.py --dry-run    # 20 条 + 全量成本预估
+python scripts/distill_generate.py              # 全量 ~18,390 次调用（预估 <¥5；熔断：失败率 >2% 或输入 token 超限即停）
+```
+
+训练机（拉取后同一会话即可在 v0.1 旁边训 v0.2，构成双头）：
+
+```bash
+git pull --ff-only
+python scripts/train_v2.py --epochs 5           # → model/head_v2.pt（4 级软标签头 + 温度）
+# 回传 artifacts/v0.2-run1：head.pt + head_v2.pt + 两份训练日志 + RUN-REPORT
+```
+
 ## 回 SG 节点后的评测
 
 ```bash

@@ -20,6 +20,9 @@
 - 成本估算：~900 token/次 × 18.4K ≈ 16.5M 输入 token，flash 档位 **< ¥5**
 - 产出：`data/distilled.jsonl`（含四级软标签）→ 训练机一次会话可同时训 v0.1（硬标签）和 v0.2（软标签）双头
 - 教师提示词已定稿（见 issue #2），输出直接是 JSON 四级概率，解析失败率进日志
+- **状态（2026-10-21）**：脚本就位——`distill_generate.py`（干跑/熔断/断点续传；教师措辞按模式库
+  四级评分尺重新冻结入库，issue #2 的 pilot 文本从未落盘）、`train_v2.py`（软标签 4 级头）、
+  `eval_export_v2.py`（期望分排序导出）。等口令开跑：先 `--dry-run` 20 条。
 - **启动条件**：你说"跑"就开（约 1 小时 API 时间）
 
 ## v0.3 — 从零 transformer（GPU，minimind 纯血形态）
