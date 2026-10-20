@@ -3,4 +3,5 @@ __pycache__/
 model/
 logs/
 data/*.jsonl
+!data/eval_sample.jsonl
 .DS_Store

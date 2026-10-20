@@ -14,8 +14,6 @@ import random
 from pathlib import Path
 
 RAW = Path("/home/ubuntu/jev-rag-zh-benchmark/data/raw/t2reranking_dev.parquet")
-PARQUET_URL = ("https://huggingface.co/api/datasets/C-MTEB/T2Reranking/"
-               "parquet/default/dev/0.parquet")
 QUESTION = {"answers": {"type": "noul", "instructions": "仅凭该段落能回答该查询吗？"}}
 MAX_CHARS = 3000
 POOL_NEGATIVES = 9
@@ -35,9 +33,13 @@ def resolve_raw(explicit: str | None) -> Path:
             return c
     dest = Path(__file__).resolve().parent.parent / "data" / "raw" / "t2reranking_dev.parquet"
     if not dest.exists():
+        import os
+
+        base = os.environ.get("HF_ENDPOINT", "https://huggingface.co").rstrip("/")
+        url = f"{base}/api/datasets/C-MTEB/T2Reranking/parquet/default/dev/0.parquet"
         dest.parent.mkdir(parents=True, exist_ok=True)
-        print(f"downloading {PARQUET_URL} …")
-        req = urllib.request.Request(PARQUET_URL, headers={"User-Agent": "minimind-jev/0.1"})
+        print(f"downloading {url} …")
+        req = urllib.request.Request(url, headers={"User-Agent": "minimind-jev/0.1"})
         with urllib.request.urlopen(req, timeout=600) as r, open(dest, "wb") as f:
             while chunk := r.read(1 << 20):
                 f.write(chunk)
@@ -78,17 +80,24 @@ def main() -> None:
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--val-frac", type=float, default=0.1)
     ap.add_argument("--parquet", default=None, help="path to t2reranking_dev.parquet (else auto-resolved)")
-    ap.add_argument("--exclude-sample", default="/home/ubuntu/jev-rag-zh-benchmark/data/s1.jsonl",
+    ap.add_argument("--exclude-sample",
+                    default=str(Path(__file__).resolve().parent.parent / "data" / "eval_sample.jsonl"),
                     help="benchmark eval sample; its queries are excluded from train/val (no leakage). "
-                         "Pass '' to disable.")
+                         "In-repo copy ships with the repo. Pass '' to disable.")
     args = ap.parse_args()
 
     rows = load_rows(resolve_raw(args.parquet))
     data = build(rows, args.seed)
 
     excluded = 0
-    if args.exclude_sample and Path(args.exclude_sample).exists():
-        bench_queries = {json.loads(l)["query"] for l in Path(args.exclude_sample).read_text().splitlines()}
+    if args.exclude_sample:
+        exclude_path = Path(args.exclude_sample)
+        if not exclude_path.exists():
+            raise SystemExit(
+                f"error: --exclude-sample '{args.exclude_sample}' not found — refusing to build a "
+                "leaky split. Use the in-repo data/eval_sample.jsonl, pass a valid path, "
+                "or pass '' to disable exclusion explicitly.")
+        bench_queries = {json.loads(l)["query"] for l in exclude_path.read_text().splitlines()}
         before = len(data)
         data = [d for d in data if d["query"] not in bench_queries]
         excluded = before - len(data)
