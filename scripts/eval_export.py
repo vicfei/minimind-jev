@@ -55,7 +55,7 @@ def main() -> None:
                 "ts": 0, "variant": "minimind-jev", "qid": qid, "pid": pid,
                 "status": 200, "latency_s": 0.0,
                 "model": "minimind-jev-v0.1 (bge-small-zh + head)",
-                "answer": {"answers": {"answers": {"type": "noul", "noul": round(p, 6)}}},
+                "answer": {"answers": {"type": "noul", "noul": round(p, 6)}},
                 "usage": {"input_tokens": 0, "cost": 0.0},
             }
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
