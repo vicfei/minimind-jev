@@ -42,6 +42,11 @@
   7. 部署：导出 ONNX 在浏览器里跑（呼应 jev-omni.js 的形态）
   每章带成本锚定（"两小时、单卡、X 块钱"）
 - **启动条件**：v0.1 三方表数字成立 + 你确认 GPU 机器
+- **状态（2026-10-21）**：代码包就位——`src/minimind_jev/`（config/tokenizer/model/data）+
+  `scripts/train_tokenizer.py` / `train_v3.py` / `eval_export_v3.py`；6L/d384/FFN×4/ctx512 ≈ 13.9M
+  参数（对齐"6 层/d384/14M"规格；ctx 512 与 bge-small 对齐保同任务可比）；BBPE 8K 词表；
+  两段式：短 MLM 预训练（自有语料）→ 二元 BCE 微调（v0.2 教训：gold 直接监督为默认）。
+  教程 0–7 章随实测数字开写。
 
 ## 命名与定位
 

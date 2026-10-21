@@ -77,6 +77,20 @@ python scripts/train_v2.py --epochs 5           # → model/head_v2.pt（4 级�
 # 回传 artifacts/v0.2-run1：head.pt + head_v2.pt + 两份训练日志 + RUN-REPORT
 ```
 
+## Phase 3：v0.3 从零 transformer（触发：SG 推送代码后随 RUNBOOK 本段执行）
+
+v0.3 起需要额外依赖：`pip install tokenizers`（tokenizer 训练用）。
+
+```bash
+git pull --ff-only
+HF_HUB_OFFLINE=1 python scripts/train_tokenizer.py           # ~1 分钟 → model/tokenizer.json
+HF_HUB_OFFLINE=1 python scripts/train_v3.py 2>&1 | tee logs-train-v3.txt
+# 输出: mlm epoch 曲线（默认 3 轮）→ finetune 曲线（默认 5 轮）→ temperature → model/v3.pt
+```
+
+产物推 `artifacts/v0.3-run1`：`v3.pt` + `tokenizer.json` + `logs-train-v3.txt` + RUN-REPORT。
+预期体量：MLM ~15–25 分钟 + 微调 ~10–20 分钟，显存 <4GB，全程 <1 小时（RTX 4060 8GB 实测口径）。
+
 ## 回 SG 节点后的评测
 
 ```bash
