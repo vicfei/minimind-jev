@@ -9,7 +9,7 @@ description = "Train your own tiny Jev (System One decision model): frozen encod
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
-dependencies = ["torch>=2.2", "sentence-transformers>=3", "pyarrow>=14"]
+dependencies = ["torch>=2.2", "sentence-transformers>=3", "pyarrow>=14", "tokenizers>=0.19"]
 
 [project.urls]
 Benchmark = "https://github.com/vicfei/jev-rag-zh-benchmark"
