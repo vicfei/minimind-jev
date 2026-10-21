@@ -72,6 +72,10 @@ def main() -> None:
     ap.add_argument("--lr", type=float, default=1e-3)
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--distilled", default="data/distilled.jsonl")
+    ap.add_argument("--aux-hard-weight", type=float, default=0.0,
+                    help="weight of an auxiliary BCE loss on the dataset's binary labels, added to the "
+                         "soft-CE distillation loss (0 = pure distillation; 0.5-1.0 recovers the direct "
+                         "ranking signal the soft labels lack — see the s1-4way result)")
     ap.add_argument("--allow-missing", action="store_true",
                     help="train on the pairs that have teacher labels even if some are missing")
     ap.add_argument("--out", default="model/head_v2.pt")
@@ -90,7 +94,7 @@ def main() -> None:
     enc = SentenceTransformer("BAAI/bge-small-zh-v1.5")
     dim = enc.get_sentence_embedding_dimension()
 
-    tr_texts, ytr, _, tr_miss = load_distilled(distilled_path, train)
+    tr_texts, ytr, htr, tr_miss = load_distilled(distilled_path, train)
     va_texts, yva, hva, va_miss = load_distilled(distilled_path, val)
     for name, miss in (("train", tr_miss), ("val", va_miss)):
         if miss:
@@ -100,7 +104,8 @@ def main() -> None:
             else:
                 raise SystemExit(f"error: {msg} — regenerate distilled data or pass --allow-missing")
     print(f"encoder: bge-small-zh-v1.5 (frozen, dim={dim}); "
-          f"train {len(tr_texts)} pairs / val {len(va_texts)} pairs (4-level soft targets)")
+          f"train {len(tr_texts)} pairs / val {len(va_texts)} pairs (4-level soft targets"
+          + (f" + aux BCE on hard labels, w={args.aux_hard_weight})" if args.aux_hard_weight else ")"))
     print("encoding train …"); Xtr = encode(enc, tr_texts)
     print("encoding val …"); Xva = encode(enc, va_texts); del enc
 
@@ -114,8 +119,12 @@ def main() -> None:
         tot, seen = 0.0, 0
         for i in range(0, n, bs):
             idx = perm[i : i + bs]
-            logp = torch.log_softmax(head(Xtr[idx]), dim=-1)
+            logits = head(Xtr[idx])
+            logp = torch.log_softmax(logits, dim=-1)
             loss = -(ytr[idx] * logp).sum(-1).mean()
+            if args.aux_hard_weight:
+                exp = (torch.softmax(logits, dim=-1) * LEVEL_WEIGHTS).sum(-1).clamp(1e-6, 1 - 1e-6)
+                loss = loss + args.aux_hard_weight * nn.functional.binary_cross_entropy(exp, htr[idx])
             opt.zero_grad(); loss.backward(); opt.step()
             tot += loss.item() * len(idx); seen += len(idx)
         head.eval()
@@ -145,7 +154,8 @@ def main() -> None:
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     torch.save({"state": head.state_dict(), "dim": dim, "levels": LEVELS,
-                "level_weights": LEVEL_WEIGHTS.tolist(), "temp": temp}, out)
+                "level_weights": LEVEL_WEIGHTS.tolist(), "temp": temp,
+                "aux_hard_weight": args.aux_hard_weight}, out)
     print(f"saved {out}")
 
 
