@@ -1,0 +1,13 @@
+Loading weights:   0%|          | 0/71 [00:00<?, ?it/s]Loading weights: 100%|██████████| 71/71 [00:00<00:00, 4320.45it/s]
+/home/chenfei/minimind-jev/scripts/train_v2.py:95: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = enc.get_sentence_embedding_dimension()
+encoder: bge-small-zh-v1.5 (frozen, dim=512); train 15660 pairs / val 1730 pairs (4-level soft targets + aux BCE on hard labels, w=1.0)
+encoding train …
+encoding val …
+epoch 1: train_loss=1.8042 val_loss=1.2790 val_acc@0.5=0.9000
+epoch 2: train_loss=1.6972 val_loss=1.2857 val_acc@0.5=0.9000
+epoch 3: train_loss=1.6802 val_loss=1.2617 val_acc@0.5=0.9000
+epoch 4: train_loss=1.6698 val_loss=1.2616 val_acc@0.5=0.9000
+epoch 5: train_loss=1.6622 val_loss=1.2486 val_acc@0.5=0.9000
+temperature (fitted on val): 1.344
+saved model/head_v21_w10.pt
