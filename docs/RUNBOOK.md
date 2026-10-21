@@ -37,9 +37,11 @@ python scripts/prepare_data.py
 ## 训练
 
 ```bash
-python scripts/train.py --epochs 5 2>&1 | tee logs-train-v01.txt
+HF_HUB_OFFLINE=1 python scripts/train.py --epochs 5 2>&1 | tee logs-train-v01.txt
 # 预期: model/head.pt + 每轮 val 曲线 + temperature
 ```
+
+> 编码器缓存已就位时带上 `HF_HUB_OFFLINE=1`（训练节点实测：不加会在 Hub 探活上退避重试 ~12 分钟）。
 
 注意 val_acc 的读法：本数据 1:9 类不平衡，**多数类基线 = 0.90**——val_acc 恒 0.90 只是"没输给
 先验"，模型真实排序能力以 SG 侧三方表的 nDCG 为准（v0.1-run1 即如此：val_acc 0.90 但 nDCG@5
