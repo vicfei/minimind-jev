@@ -43,6 +43,8 @@ def main() -> None:
     ap.add_argument("--mlm-lr", type=float, default=3e-4)
     ap.add_argument("--lr", type=float, default=3e-4)
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--max-pairs", type=int, default=None,
+                    help="smoke mode: train on only the first N query rows (pipeline check, not a real run)")
     ap.add_argument("--out", default="model/v3.pt")
     args = ap.parse_args()
 
@@ -63,11 +65,14 @@ def main() -> None:
 
     train_rows = load_splits(root, ("train",))
     val_rows = load_splits(root, ("val",))
+    if args.max_pairs:
+        train_rows = train_rows[: args.max_pairs]
+        val_rows = val_rows[: max(1, args.max_pairs // 10)]
 
     # ---- stage 1: MLM pretraining on the unlabeled corpus ----
     model = DecisionModel(cfg).to(device)
     if args.mlm_epochs > 0:
-        corpus = corpus_lines(load_splits(root))
+        corpus = corpus_lines(train_rows + val_rows)  # unlabeled; follows --max-pairs in smoke mode
         mlm = MLMModel(cfg).to(device)
         # share the encoder so pretraining weights carry straight into the decision model
         mlm.encoder.load_state_dict(model.encoder.state_dict())
