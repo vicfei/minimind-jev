@@ -1,0 +1,15 @@
+HTTP Error 429 thrown while requesting HEAD https://hf-mirror.com/BAAI/bge-small-zh-v1.5/resolve/7999e1d3359715c523056ef9478215996d62a620/model.safetensors
+Rate limited. Waiting 8.0s before retry [Retry 1/5].
+Loading weights:   0%|          | 0/71 [00:00<?, ?it/s]Loading weights: 100%|██████████| 71/71 [00:00<00:00, 4836.31it/s]
+/home/chenfei/minimind-jev/scripts/train.py:68: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = enc.get_sentence_embedding_dimension()
+encoder: bge-small-zh-v1.5 (frozen, dim=512)
+encoding train …
+encoding val …
+epoch 1: train_loss=0.4351 val_loss=0.3264 val_acc=0.9000
+epoch 2: train_loss=0.3234 val_loss=0.3219 val_acc=0.9000
+epoch 3: train_loss=0.3200 val_loss=0.3189 val_acc=0.9000
+epoch 4: train_loss=0.3179 val_loss=0.3179 val_acc=0.9000
+epoch 5: train_loss=0.3162 val_loss=0.3173 val_acc=0.9000
+temperature (fitted on val): 1.031
+saved model/head.pt
