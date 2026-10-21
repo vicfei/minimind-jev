@@ -2,7 +2,7 @@
 
 Train your own tiny **Jev** — a System One typed-decision model, in the spirit of the [minimind](https://github.com/jingyaogong/minimind) series (open the black box, not chase SOTA), applied to decision models instead of LLMs.
 
-> Status: **v0.1 trained, evaluated, and published** — [HF cnfeichen/minimind-jev-v0.1](https://huggingface.co/cnfeichen/minimind-jev-v0.1) · [ModelScope mirror](https://modelscope.cn/models/cnfeichen/minimind-jev-v0.1). The **decision head is trained from scratch**; the text encoder is frozen ([BAAI/bge-small-zh-v1.5](https://huggingface.co/BAAI/bge-small-zh-v1.5)). Repo stays private while v0.2 (distillation) and v0.3 (from-scratch transformer + Chinese tutorial) are in build.
+> Status: **v0.1 trained, evaluated, and published** — [HF cnfeichen/minimind-jev-v0.1](https://huggingface.co/cnfeichen/minimind-jev-v0.1) · [ModelScope mirror](https://modelscope.cn/models/cnfeichen/minimind-jev-v0.1). The **decision head is trained from scratch**; the text encoder is frozen ([BAAI/bge-small-zh-v1.5](https://huggingface.co/BAAI/bge-small-zh-v1.5)). Repo is public — v0.2 (distillation) and v0.3 (from-scratch transformer + Chinese tutorial) are in build.
 
 ## Results — v0.1 (2026-10-21)
 
