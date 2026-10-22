@@ -27,6 +27,10 @@ Same protocol as [jev-rag-zh-benchmark](https://github.com/vicfei/jev-rag-zh-ben
 
 **Calibration notes (the honest part):** the split is 1:9 (1 positive + 9 negatives per query), so val_acc 0.9000 is exactly the majority-class baseline — accuracy is uninformative here and the ranking metrics above are the real signal. v0.1's fitted temperature is 1.031 and its probabilities stay compressed near the class prior (mean 0.114 on positives vs 0.096 on negatives): v0.1 is a **ranker, not a calibrated probability source** — thresholds need per-decision fitting, mirroring the benchmark's finding on fixed 0.5 cutoffs. Soft labels did decompress the probabilities as hoped (positive mean 0.114 → 0.386) — but at the cost of the ranking signal, which is the trade the notes document.
 
+## Tutorial (中文教程)
+
+Eight chapters from tokenizer to browser deployment, every number from this repo's real runs — including the failures: [docs/tutorial/zh/](docs/tutorial/zh/README.md)（决策模型心智模型 → 数据 → BBPE → 白盒 transformer → 训练与校准 → 评测读表 → 蒸馏负结果 → ONNX 部署，全程 ≤ ¥8）.
+
 ## Roadmap
 
 - **v0.1 (done)** — frozen Chinese encoder + from-scratch MLP head, trained on [C-MTEB/T2Reranking](https://huggingface.co/datasets/C-MTEB/T2Reranking) hard negatives (binary labels, the dataset's own; question wording frozen from [awesome-jev-prompts](https://github.com/vicfei/awesome-jev-prompts)). Temperature-scaled on a held-out split. Runs on a laptop CPU; measured at ~3 min on GPU. Published as a checkpoint.
