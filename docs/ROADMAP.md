@@ -49,6 +49,8 @@
   部署澄清（2026-10-22 核实）：vllm-jev 服务的是特定 LLM 衍生检查点家族（Laya/Kev/Decider 等 24+ 个，
   CPU 路径仅 Windows 且实测 48-90s/请求）——与本项目自定义小编码器不匹配；**ONNX/浏览器为主线不动摇**，
   1.5M 模型也不需要 vLLM 级并发调度。
+  **基准扩展候选（2026-10-31 记入，等 WSL2）**：JevAny-Qwen3.5-4B（底座 Qwen 中文强，vllm-jev 可部署）
+  → 跑 s1 中文重排 → 社区表再加一行开源权重；同批候选 Kev-0.8B（vllm-jev Windows CPU 路径）。
 
 ## 命名与定位
 
