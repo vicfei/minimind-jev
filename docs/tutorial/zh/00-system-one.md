@@ -39,6 +39,8 @@
 | （参照）hosted Jev 1.13 | — | 0.546 [0.481, 0.611] | — |
 | （参照）BM25 | — | 0.413 [0.353, 0.477] | — |
 
+想看这个架构在生产管线里的样子？[JevAny](https://github.com/SimpleJev/JevAny) 的 [agent 回路演示](https://simplejev.org/JevAny/index.html#case-library)录了三段双人对跑——左边 LLM-only、右边 LLM + Jev：WebShop 里 Jev 从菜单选项中选出正确的颜色/尺码（5 步 vs 9 步）；FrozenLake 里一次 LLM 规划后 Jev 逐状态比较四个方向（1 次调用 vs 4 次）。这就是本教程第 0 章讲的"模型提议、Jev 答问、代码组合裁定"合同的运行画面。
+
 先把丑话说完：**三个 homemade 模型没有一个打赢 hosted Jev 的点估计**。但读法要准确——
 
 - v0.1 对 hosted Jev 的配对差是 −0.059 [−0.040, +0.157]，**置信区间含零**：在这个样本量下两者统计不可分；
